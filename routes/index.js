@@ -30,6 +30,7 @@ router.delete('/transaction/:id', AuthMiddleware.Authnticate, TransactionControl
 
 router.post('/user/register', UserController.Register);
 router.post('/user/login', UserController.Login);
+router.post('/authnticate', UserController.Authnticate);
 router.get('/user/:id', AuthMiddleware.Authnticate, UserController.GetUser);
 
 module.exports = router;

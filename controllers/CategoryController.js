@@ -8,7 +8,7 @@ var Models = require('../models/');
  */
 exports.List = async (req, res) => {
     try {
-        
+
         // find the category
         let Category = await Models.Category.findAll({
             where: {
@@ -81,6 +81,7 @@ exports.Create = async (req, res) => {
     } catch (error) {
         res['message'] = error.message;
         res['data'] = error;
+        res['code'] = 500;
         ResponseManager.SendResponse(res);
     }
 }
@@ -138,6 +139,7 @@ exports.Update = async (req, res) => {
     } catch (error) {
         res['message'] = error.message;
         res['data'] = error;
+        res['code'] = 500;
         ResponseManager.SendResponse(res);
     }
 }
@@ -175,8 +177,9 @@ exports.Read = async (req, res) => {
         ResponseManager.SendResponse(res);
 
     } catch (error) {
-        res.message = error.message;
-        res.data = error;
+        res['message'] = error.message;
+        res['data'] = error;
+        res['code'] = 500;
         ResponseManager.SendResponse(res);
     }
 }
@@ -225,6 +228,7 @@ exports.Delete = async (req, res) => {
     } catch (error) {
         res['message'] = error.message;
         res['data'] = error;
+        res['code'] = 500;
         ResponseManager.SendResponse(res);
     }
 }

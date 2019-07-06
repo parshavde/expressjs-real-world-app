@@ -45,6 +45,7 @@ exports.Register = async (req, res) => {
     } catch (error) {
         res['message'] = error.message;
         res['data'] = error;
+        res['code'] = 500;
         ResponseManager.SendResponse(res);
     }
 }
@@ -106,6 +107,30 @@ exports.Login = async (req, res) => {
     } catch (error) {
         res.message = error.message;
         res.data = error;
+        ResponseManager.SendResponse(res);
+    }
+}
+
+exports.Authnticate = (req, res) => {
+    try {
+        let CurruntTime = +new Date();
+        jwt.verify(req.body.token, Key, (error, Decoded) => {
+            if (error) {
+                throw error;
+            }
+            if (Decoded.exp <= CurruntTime) {
+                res['message'] = "Success";
+                res['data'] = true;
+                res['code'] = 200;
+                ResponseManager.SendResponse(res);
+            } else {
+                throw new Error("Something went wrong, Please login again.");
+            }
+        });
+    } catch (error) {
+        res['message'] = error.message;
+        res['data'] = error;
+        res['code'] = 401;
         ResponseManager.SendResponse(res);
     }
 }

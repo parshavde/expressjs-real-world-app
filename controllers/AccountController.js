@@ -8,7 +8,7 @@ var Models = require('../models/');
  */
 exports.List = async (req, res) => {
     try {
-        
+
         // find the accounts
         let Account = await Models.Account.findAll({
             where: {
@@ -79,6 +79,7 @@ exports.Create = async (req, res) => {
         ResponseManager.SendResponse(res);
 
     } catch (error) {
+        res['code'] = 500;
         res['message'] = error.message;
         res['data'] = error;
         ResponseManager.SendResponse(res);
