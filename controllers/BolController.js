@@ -1,5 +1,6 @@
 var ResponseManager = require('../helper/ResponseManager');
 var Models = require('../models/');
+var Sequelize = require('sequelize');
 
 /**
  * @name : List
@@ -10,25 +11,29 @@ exports.List = async (req, res) => {
     try {
 
         // find the accounts
-        let Account = await Models.Account.findAll({
+        let BolHead = await Models.BolHead.findAll({
             where: {
                 user_id: req.user.id
             },
-            attributes: ['name', 'summary', 'id']
+            include: [{
+                model: Models.BolDetail,
+                required: false
+            }]
         }).catch((error) => {
             throw error;
         })
 
-        if (!Account) {
-            throw new Error("Accounts not exist");
+        if (!BolHead) {
+            throw new Error("BOLs not exist");
         }
 
-        res.data = Account;
-        res.message = "Accounts fetched successfully";
+        res.data = BolHead;
+        res.message = "BOLs fetched successfully";
 
         ResponseManager.SendResponse(res);
 
     } catch (error) {
+        res.code = 500;
         res.message = error.message;
         res.data = error;
         ResponseManager.SendResponse(res);
@@ -43,37 +48,33 @@ exports.List = async (req, res) => {
 exports.Create = async (req, res) => {
     try {
         // create a copy of the reqest body
-        let PreparedData = {
-            ...req.body
-        }
+        let HeadData = req.body;
+        let DetailData = req.body['bol_item_detail'];
 
-        PreparedData['user_id'] = req.user.id;
+        HeadData['user_id'] = req.user.id;
+        delete HeadData['bol_item_detail'];
 
-        var Account = {};
+        let TransectionId = await Sequelize.transaction();
 
-        // check that account is exist or not
-        Account = await Models.Account.count({
-            where: {
-                name: PreparedData.name,
-                user_id: PreparedData.user_id
-            }
+        let BolHead = await Models.BolHead.create(HeadData, {
+            transaction: TransectionId
         }).catch((error) => {
             throw error;
-        })
+        });
 
-        // User not exist so create the user
-        if (!Account) {
-            Account = await Models.Account.create(PreparedData).catch((error) => {
-                throw error;
-            });
-            res['code'] = 201;
-            res['data'] = Account;
-            res['message'] = "Account created";
-        }
-        // User exist so throw the error
-        else {
-            throw new Error("Account Exist");
-        }
+        DetailData.forEach((e, i) => {
+            DetailData[i]['bol_head_id'] = BolHead['id']
+        });
+
+        let BolDetail = await Models.BolDetail.create(DetailData, {
+            transaction: TransectionId
+        }).catch((error) => {
+            throw error;
+        });
+
+        res['code'] = 201;
+        res['data'] = Account;
+        res['message'] = "BOL created";
 
         // Send the response
         ResponseManager.SendResponse(res);
@@ -106,7 +107,7 @@ exports.Update = async (req, res) => {
         let Account = {};
 
         // check that account is exist or not
-        Account = await Models.Account.findOne({
+        Account = await Models.BolHead.findOne({
             where: {
                 id: AccountId,
                 user_id: PreparedData.user_id
@@ -117,7 +118,7 @@ exports.Update = async (req, res) => {
 
         // User not exist so create the user
         if (Account) {
-            Account = await Models.Account.update(PreparedData, {
+            Account = await Models.BolHead.update(PreparedData, {
                 where: {
                     id: AccountId
                 }
@@ -153,7 +154,7 @@ exports.Read = async (req, res) => {
         var AccountId = req.params.id;
 
         // find the accounts
-        let Account = await Models.Account.findOne({
+        let Account = await Models.BolHead.findOne({
             where: {
                 id: AccountId,
                 user_id: req.user.id
@@ -195,7 +196,7 @@ exports.Delete = async (req, res) => {
         let Account = {};
 
         // check that account is exist or not
-        Account = await Models.Account.findOne({
+        Account = await Models.BolHead.findOne({
             where: {
                 id: AccountId,
                 user_id: req.user.id
@@ -206,7 +207,7 @@ exports.Delete = async (req, res) => {
 
         // User not exist so create the user
         if (Account) {
-            Account = await Models.Account.destroy({
+            Account = await Models.BolHead.destroy({
                 where: {
                     id: AccountId
                 }

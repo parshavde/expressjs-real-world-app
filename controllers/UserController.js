@@ -67,7 +67,7 @@ exports.Login = async (req, res) => {
             where: {
                 email: PreparedData.email
             },
-            attributes: ['id', 'name', 'email', 'password'],
+            attributes: ['id', 'company_name', 'email', 'password'],
             raw: true
         }).catch((error) => {
             throw error;

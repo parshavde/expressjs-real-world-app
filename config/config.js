@@ -2,7 +2,7 @@ module.exports = {
     development: {
         username: "root",
         password: "",
-        database: "account_app",
+        database: "foxhub",
         host: "localhost",
         dialect: 'mysql',
         key: 'parshav123',
