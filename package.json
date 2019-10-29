@@ -20,6 +20,6 @@
     "mysql2": "^1.6.5",
     "nodemon": "^1.19.1",
     "password-hash": "^1.2.2",
-    "sequelize": "^5.9.0"
+    "sequelize": "^5.15.1"
   }
 }
